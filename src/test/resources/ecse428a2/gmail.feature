@@ -4,6 +4,7 @@ Feature: Gmail
   Scenario: Testing
     Given I am logged in
     When I click the ‘Compose’ button
+    And I enter a valid email in the ‘to’ section
     Then We Gucci
 
   Scenario: Attaching one image and sending to recipient

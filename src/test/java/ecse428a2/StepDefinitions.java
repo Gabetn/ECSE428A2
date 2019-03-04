@@ -73,12 +73,28 @@ public class StepDefinitions {
                             By.xpath("//div[contains(text(),'Compose')]"))); //TODO assumes english
             System.out.print("Found!\n");
             btn.click();
-            System.out.println("Clicking Compose button.");
+            System.out.println("Clicking Compose button.");//NOTE: Assumes that menu not minimized to only '+' symbol
         } catch (Exception e) {
             System.out.println("No Compose button found");
         }
     }
 
+    @And("^I enter a valid email in the ‘to’ section$")
+    public void enterValidEmail() throws Throwable { //TODO: how to use scenario outline
+        try {
+            System.out.println("Attempting to find Recipients Field... ");
+            WebElement textField = (new WebDriverWait(driver, 10))
+                    .until(ExpectedConditions.elementToBeClickable(
+                            By.xpath("//textarea[contains(@name,'to')]"))); //TODO assumes english
+            System.out.print("Found!\n");
+
+            System.out.println("Entering email...");
+            enterText(textField,EMAIL,Keys.ENTER); //TODO replace text w/ outline value
+            System.out.println("Entered");
+        } catch (Exception e) {
+            System.out.println("No Recipient field found");
+        }
+    }
     //----------------------------------------OLD--------------------------------------------
     @Then("^We Gucci$")
     public void trivialEnd() throws Throwable {
@@ -107,21 +123,7 @@ public class StepDefinitions {
         goTo(CART_URL);
     }
 
-    @And("^my shopping cart is empty$")
-    public void myShoppingCartIsEmpty() throws Throwable {
-        goTo(CART_URL);
 
-        // Wait for presence of current active cart
-        WebElement cart = (new WebDriverWait(driver, 10))
-                .until(ExpectedConditions.presenceOfElementLocated(By.id(ACTIVE_CART)));
-
-        // If cart is not empty, delete whatever is in it
-        if (!searchForText(cart.getText(), "empty")) {
-            WebElement btn = (new WebDriverWait(driver, 10))
-                    .until(ExpectedConditions.elementToBeClickable(By.name(DELETE_BTN_NAME)));
-            btn.click();
-        }
-    }
 
     @And("^I have the same product that already exists in my shopping cart$")
     public void iHaveTheSameProductThatAlreadyExistsInMyShoppingCart() throws Throwable {
