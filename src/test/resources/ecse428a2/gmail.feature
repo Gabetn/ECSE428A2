@@ -3,7 +3,8 @@ Feature: Gmail
   #This scenario is just for testing purposes
   Scenario: Testing
     Given I am logged in
-    Then We gucci
+    When I click the ‘Compose’ button
+    Then We Gucci
 
   Scenario: Attaching one image and sending to recipient
     Given I am logged in

@@ -63,6 +63,27 @@ public class StepDefinitions {
         Assert.assertEquals(currURL,expected);
     }
 
+    // When
+    @When("^I click the ‘Compose’ button$")
+    public void iPressCompose() throws Throwable {
+        try {
+            System.out.println("Attempting to find Compose button... ");
+            WebElement btn = (new WebDriverWait(driver, 10))
+                    .until(ExpectedConditions.elementToBeClickable(
+                            By.xpath("//div[contains(text(),'Compose')]"))); //TODO assumes english
+            System.out.print("Found!\n");
+            btn.click();
+            System.out.println("Clicking Compose button.");
+        } catch (Exception e) {
+            System.out.println("No Compose button found");
+        }
+    }
+
+    //----------------------------------------OLD--------------------------------------------
+    @Then("^We Gucci$")
+    public void trivialEnd() throws Throwable {
+        Assert.assertTrue(true);
+    }
     @Given("^I am on my current shopping cart$")
     public void iAmOnMyCurrentShoppingCart() throws Throwable {
         setupSeleniumWebDrivers();
@@ -107,21 +128,7 @@ public class StepDefinitions {
         iHaveAProductThatExistsInMyShoppingCart();
     }
 
-    // When
-    @When("^I press \"Delete\"$")
-    public void iPressDelete() throws Throwable {
-        // Attempt to find a delete button and click on it
-        try {
-            System.out.println("Attempting to find delete button... ");
-            WebElement btn = (new WebDriverWait(driver, 10))
-                    .until(ExpectedConditions.elementToBeClickable(By.name(DELETE_BTN_NAME)));
-            System.out.print("Found!\n");
-            btn.click();
-            System.out.println("Clicking delete button.");
-        } catch (Exception e) {
-            System.out.println("No delete button present");
-        }
-    }
+
 
     @When("^I press \"Add to cart\"$")
     public void iPressAddToCart() throws Throwable {
