@@ -7,6 +7,7 @@ import cucumber.api.java.en.Then;
 import cucumber.api.java.en.When;
 import org.junit.Assert;
 import org.openqa.selenium.By;
+import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
@@ -18,8 +19,6 @@ import java.net.MalformedURLException;
 public class StepDefinitions {
 
     // Variables
-    private WebDriver driver;
-    private final String PATH_TO_CHROME_DRIVER = "C:\\Users\\Gabriel\\Documents\\Applications\\chromedriver_win32\\chromedriver.exe";
     private final String PRODUCT_URL = "https://www.amazon.ca/Monoprice-115365-Select-Mini-Printer/dp/B01FL49VZE/ref=sr_1_1?ie=UTF8&qid=1488132110&sr=8-1&keywords=3d+printer";
     private final String PRODUCT_NAME = "Monoprice 115365 Monoprice Select Mini 3D Printer";
     private final String DELETE_BTN_NAME = "submit.delete.C3NLW69582M4B4";
@@ -28,12 +27,40 @@ public class StepDefinitions {
     private final String ACTIVE_CART = "sc-active-cart";
     private final String CHECKOUT_BTN = "sc-proceed-to-checkout";
 
-
+    // MY VARIABLES
+    private WebDriver driver;
+    private final String PATH_TO_CHROME_DRIVER = "C:\\Users\\Gabriel\\Documents\\Applications\\chromedriver_win32\\chromedriver.exe";
+    private final String LOG_IN = "https://accounts.google.com/AccountChooser?service=mail&continue=https://mail.google.com/mail/";
+    private final String EMAIL = "GabrielNegashECSE428@gmail.com";
+    private final String PASSWORD = "ECSE428A2";
     // Given
-    @Given("^I am on a Amazon product page$")
-    public void givenOnAmazonProductPage() throws Throwable {
+    @Given("^I am logged in$")
+    public void givenLoggedIn() throws Throwable {
         setupSeleniumWebDrivers();
-        goTo(PRODUCT_URL);
+
+        goTo(LOG_IN);
+        System.out.println("Entering email...");
+
+        WebElement textField = (new WebDriverWait(driver, 10))
+                .until(ExpectedConditions.presenceOfElementLocated(By.id("identifierId")));
+        System.out.print("Found!\n");
+
+        enterText(textField,EMAIL,Keys.ENTER);
+
+        System.out.println("Entering password...");
+        textField = (new WebDriverWait(driver, 10))
+                .until(ExpectedConditions.presenceOfElementLocated(By.name("password")));
+        System.out.print("Found!\n");
+
+        enterText(textField,PASSWORD,Keys.ENTER);
+
+        //ENSURE PROPER REDIRECT
+        String expected = "https://mail.google.com/mail/#inbox";
+        new WebDriverWait(driver, 10)
+                .until(ExpectedConditions.urlToBe(expected));
+
+        String currURL = driver.getCurrentUrl();
+        Assert.assertEquals(currURL,expected);
     }
 
     @Given("^I am on my current shopping cart$")
@@ -191,7 +218,9 @@ public class StepDefinitions {
         }
     }
 
-    // Helper functions
+    /**
+     *     Helper functions
+      */
     private void setupSeleniumWebDrivers() throws MalformedURLException {
         if (driver == null) {
             System.out.println("Setting up ChromeDriver... ");
@@ -201,7 +230,14 @@ public class StepDefinitions {
         }
     }
 
-    private boolean searchForText(String text, String textToFind) {
+    private void enterText(WebElement textField,String str,Keys fin){
+        //textField.sendKeys(Keys.TAB);
+        textField.clear();
+        textField.sendKeys(str);
+        textField.sendKeys(fin);
+    }
+
+    private boolean searchForText(String text, String textToFind) { //TODO: is this necessary?
         return text.contains(textToFind);
     }
 
