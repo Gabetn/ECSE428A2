@@ -15,6 +15,7 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.net.MalformedURLException;
+import java.util.concurrent.TimeUnit;
 
 public class StepDefinitions {
 
@@ -79,8 +80,8 @@ public class StepDefinitions {
         }
     }
 
-    @And("^I enter a valid email in the ‘to’ section$")
-    public void enterValidEmail() throws Throwable { //TODO: how to use scenario outline
+    @And("^I enter a valid ([^\"]*) in the ‘to’ section$")
+    public void enterValidEmail(String validEmail) throws Throwable { //TODO: how to use scenario outline
         try {
             System.out.println("Attempting to find Recipients Field... ");
             WebElement textField = (new WebDriverWait(driver, 10))
@@ -89,7 +90,24 @@ public class StepDefinitions {
             System.out.print("Found!\n");
 
             System.out.println("Entering email...");
-            enterText(textField,EMAIL,Keys.ENTER); //TODO replace text w/ outline value
+            enterText(textField,validEmail,Keys.ENTER); //TODO replace text w/ outline value
+            System.out.println("Entered");
+        } catch (Exception e) {
+            System.out.println("No Recipient field found");
+        }
+    }
+
+    @And("^I enter a invalid ([^\"]*) in the ‘to’ section$")
+    public void enterInvalidEmail(String invalidEmail) throws Throwable { //TODO: how to use scenario outline
+        try {
+            System.out.println("Attempting to find Recipients Field... ");
+            WebElement textField = (new WebDriverWait(driver, 10))
+                    .until(ExpectedConditions.elementToBeClickable(
+                            By.xpath("//textarea[contains(@name,'to')]"))); //TODO assumes english
+            System.out.print("Found!\n");
+
+            System.out.println("Entering email...");
+            enterText(textField,invalidEmail,Keys.ENTER); //TODO replace text w/ outline value
             System.out.println("Entered");
         } catch (Exception e) {
             System.out.println("No Recipient field found");
@@ -99,6 +117,9 @@ public class StepDefinitions {
     @Then("^We Gucci$")
     public void trivialEnd() throws Throwable {
         Assert.assertTrue(true);
+        //driver.manage().timeouts().implicitlyWait(4, TimeUnit.SECONDS);
+        Thread.sleep(4000);
+        driver.quit();
     }
     @Given("^I am on my current shopping cart$")
     public void iAmOnMyCurrentShoppingCart() throws Throwable {
