@@ -14,6 +14,10 @@ import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
+import java.awt.*;
+import java.awt.datatransfer.*;
+import java.awt.event.KeyEvent; //Used for mocking user key strokes for windows file explorer
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.util.concurrent.TimeUnit;
 
@@ -113,12 +117,49 @@ public class StepDefinitions {
             System.out.println("No Recipient field found");
         }
     }
+
+    // When
+    @And("^I click the ‘Attach files’ button$")
+    public void iPressAttach() throws Throwable {
+        try {
+            System.out.println("Attempting to find Attach button... ");
+            WebElement btn = (new WebDriverWait(driver, 10))
+                    .until(ExpectedConditions.elementToBeClickable(
+                            By.xpath("//div[contains(@class,'a1 aaA aMZ')]"))); //Note: assumes class name doesn't change
+            System.out.print("Found!\n");
+            btn.click();
+            System.out.println("Clicking Attach button.");
+        } catch (Exception e) {
+            System.out.println("No Attach button found");
+        }
+    }
+
+    @When("^I select the file ([^\"]*) I want to send$")
+    public void selectFile(String fPath) throws Throwable { //TODO: how to use scenario outline
+        Robot r = new Robot();
+        //copy to clipboard
+        Clipboard cb = Toolkit.getDefaultToolkit().getSystemClipboard();
+        StringSelection stringSelection = new StringSelection( fPath );
+        cb.setContents(stringSelection, stringSelection);//st
+        //Paste to file explorer
+        r.keyPress(KeyEvent.VK_CONTROL);
+        r.keyPress(KeyEvent.VK_V);
+        r.keyRelease(KeyEvent.VK_V);
+        r.keyRelease(KeyEvent.VK_CONTROL);
+        //Click Enter
+        r.keyPress(KeyEvent.VK_ENTER);    // confirm by pressing Enter in the end
+        r.keyRelease(KeyEvent.VK_ENTER);
+
+    }
+
+
+
     //----------------------------------------OLD--------------------------------------------
     @Then("^We Gucci$")
     public void trivialEnd() throws Throwable {
         Assert.assertTrue(true);
         //driver.manage().timeouts().implicitlyWait(4, TimeUnit.SECONDS);
-        Thread.sleep(4000);
+        Thread.sleep(5000);
         driver.quit();
     }
     @Given("^I am on my current shopping cart$")

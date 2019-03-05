@@ -5,12 +5,14 @@ Feature: Gmail
     Given I am logged in
     When I click the ‘Compose’ button
     And I enter a valid <valid email> in the ‘to’ section
+    And I click the ‘Attach files’ button
+    When I select the file <file> I want to send
     Then We Gucci
 
     Examples:
-    | valid email    |
-    | abcd.com |
-    | efgh@gmail.com |
+    | valid email    | file   |
+    | abcd.com       | C:\Users\Gabriel\Documents\ecse428a2\pics\paper.jpg |
+    #| efgh@gmail.com | C:\Users\Gabriel\Documents\ecse428a2\pics\satelite.jpg |
 
 
   Scenario: Attaching one image and sending to recipient
@@ -18,7 +20,7 @@ Feature: Gmail
     When I click the ‘Compose’ button
     And I enter a valid <valid email> in the ‘to’ section
     And I click the ‘Attach files’ button
-    When I select the file I want to send
+    When I select the file <file> I want to send
     And I click the ‘Send’ button
     Then the email shall be sent
 
