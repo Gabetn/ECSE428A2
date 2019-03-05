@@ -1,10 +1,7 @@
 package ecse428a2;
 
 import cucumber.api.PendingException;
-import cucumber.api.java.en.And;
-import cucumber.api.java.en.Given;
-import cucumber.api.java.en.Then;
-import cucumber.api.java.en.When;
+import cucumber.api.java.en.*;
 import org.junit.Assert;
 import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.ChromeDriver;
@@ -188,9 +185,11 @@ public class StepDefinitions {
                     .until(ExpectedConditions.elementToBeClickable(
                             By.xpath("//div[contains(text(),'Send')]"))); //TODO assumes english
             System.out.print("Found!\n");
+            Thread.sleep(1000);
             btn.click();
             System.out.println("Clicking Send button.");
         } catch (Exception e) {
+            System.out.println(e.getMessage());
             System.out.println("No Send button found");
         }
     }
@@ -219,6 +218,64 @@ public class StepDefinitions {
         System.out.println("Alert Text: "+alert.getText());
         Assert.assertEquals(alert.getText(),WARNING); //NOTE: assumes confirmation message doesn't change
     }
+    @Then("^the system shall attach the file\\(s\\) ([^\"]*) as google drive link\\(s\\)$")
+    public void isAttached(String fPath) throws Throwable {
+        String[] names = fPath.split("\n");
+        WebElement link;
+        boolean allFound = true;
+        int i=0;
+        for(String file : names){
+            file = file.trim();
+            int last = file.lastIndexOf('\\');
+            System.out.println("Original: "+file+"\n \tlast: "+last+" remaining: "+(file.length()-last));
+            file = file.substring(last+1);
+            System.out.println(file);
+            try{
+                String query = "//span[contains(text(),'"+file+"')]";
+                ////span[contains(text(),'Message sent.')]
+                link = (new WebDriverWait(driver, 15))
+                        .until(ExpectedConditions.elementToBeClickable(
+                                By.xpath(query)));
+                                //By.xpath("//div[contains(@class,'gmail_drive_chip')]["+i+"]"+query))); //NOTE assumes english
+                System.out.print("Found!\n");
+            } catch (Exception e) {
+                allFound = false;
+                System.out.println("File "+file+" not found as google drive link");
+                break;
+            }
+        }
+        Assert.assertTrue(allFound);
+    }
+
+    @And("^I confirm drive permissions for ([^\"]*)$")
+    public void iGivePermissions(String validEmail) throws Throwable {
+        if(validEmail.equals(EMAIL)){
+            //in case of sending email to self, gmail does not prompt drive permissions
+            //NOTE: dependent on implementation of drive.
+        }else{
+            WebElement iFrame = (new WebDriverWait(driver, 15))
+                    .until(ExpectedConditions.elementToBeClickable(
+                            By.xpath("//iframe[contains(@class,'Qr-Mr-Jz-avO')]"))); //NOTE assumes doesn't change
+
+            driver.switchTo().frame(iFrame);
+            try {
+                System.out.println("Attempting to find drive confirmation button... ");
+                WebElement btn = (new WebDriverWait(driver, 10))
+                        .until(ExpectedConditions.elementToBeClickable(
+                                By.xpath("//span[contains(text(),'Send')]"))); //NOTE assumes english
+                System.out.print("Found!\n");
+                Thread.sleep(1000);
+                btn.click();
+                System.out.println("Confirming");
+            } catch (Exception e) {
+                System.out.println(e.getMessage());
+            }
+            driver.switchTo().defaultContent(); //TODO: ensure works, might need to replace with frame(0);
+        }
+
+    }
+
+
 
     @When("^I click the ‘Ok’ button$")
     public void iPressOk() throws Throwable {
@@ -230,6 +287,23 @@ public class StepDefinitions {
             driver.switchTo().alert().accept();
         }
         System.out.println("Accepted alert... ");
+    }
+
+    @But("^the cumulative size of the files exceed the attachment limit$")
+    public void isTooBig() throws Throwable {
+        System.out.println("Attempting to find message ...");
+        //NOTE: Assumes span is only visible within html after email sent as opposed to simply being hidden
+        WebElement message = (new WebDriverWait(driver, 15))
+                .until(ExpectedConditions.elementToBeClickable(
+                        By.xpath("//div[contains(@class,'HyIydd')]"))); //NOTE assumes english
+        System.out.print("Found!\n");
+        String s = message.getText();
+        //Wait until the images are fully loaded
+        (new WebDriverWait(driver, 10)).until(ExpectedConditions.invisibilityOfElementLocated(
+                By.xpath("//div[contains(@class,'HyIydd')]")));
+
+        //Validate div actually contains warning message
+        Assert.assertTrue(searchForText(s,"larger than"));
     }
 
 

@@ -25,14 +25,13 @@ Feature: Gmail
     Given I am logged in
     When I click the ‘Compose’ button
     And I enter a valid <valid email> in the ‘to’ section
-    And I enter <text> in <body/subject> section
+    And I enter <text> in <section> section
     And I click the ‘Attach files’ button
     When I select the file <file> I want to send
     And I click the ‘Send’ button
     Then the email shall be sent
 
-  #Sending image(s) without a subject and body
-  Scenario Outline: Testing
+  Scenario Outline: Sending image(s) without a subject and body
     Given I am logged in
     When I click the ‘Compose’ button
     And I enter a valid <valid email> in the ‘to’ section
@@ -47,22 +46,33 @@ Feature: Gmail
       | valid email                    | file      |
       | GabrielNegashECSE428@gmail.com | C:\Users\Gabriel\Documents\ecse428a2\pics\small.jpg |
 
-  Scenario: Attaching an image that is too large
+    #Attaching an image that is too large
+  Scenario Outline: Testing
     Given I am logged in
     When I click the ‘Compose’ button
     And I enter a valid <valid email> in the ‘to’ section
+    And I enter <text> in <section> section
     And I click the ‘Attach files’ button
-    When I select the files I want to send
+    When I select the file <file> I want to send
     But the cumulative size of the files exceed the attachment limit
-    And I click the ‘Send’ button
+    Then the system shall attach the file(s) <file> as google drive link(s)
+    When I click the ‘Send’ button
+    And I confirm drive permissions for <valid email>
     Then the email shall be sent
 
+    Examples:
+    #Values for body/Subject: body, subject, both
+    #Values for file: small, medium, large, small \n medium
+      | valid email                    | file      | text | section|
+      | GabrielNegashECSE428@gmail.com | C:\Users\Gabriel\Documents\ecse428a2\pics\xl2.jpg | One | body |
+      | gabetadesse@gmail.com | C:\Users\Gabriel\Documents\ecse428a2\pics\xl2.jpg | One | body |
   Scenario Outline: Attaching an image and sending to an invalid recipient
     Given I am logged in
     When I click the ‘Compose’ button
     And I enter an invalid <invalid email> in the ‘to’ section
+    And I enter <text> in <body/subject> section
     And I click the ‘Attach files’ button
-    When I select the files I want to send
+    When I select the file <file> I want to send
     And I click the ‘Send’ button
     Then an error message shall be returned
     And the email shall not be sent
