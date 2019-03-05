@@ -152,7 +152,27 @@ public class StepDefinitions {
 
     }
 
+    @And("^I click the ‘Send’ button$")
+    public void iPressSend() throws Throwable {
+        try {
+            System.out.println("Attempting to find Send button... ");
+            WebElement btn = (new WebDriverWait(driver, 10))
+                    .until(ExpectedConditions.elementToBeClickable(
+                            By.xpath("//div[contains(text(),'Send')]"))); //TODO assumes english
+            System.out.print("Found!\n");
+            btn.click();
+            System.out.println("Clicking Send button.");
+        } catch (Exception e) {
+            System.out.println("No Send button found");
+        }
+    }
 
+    @Then("^the email shall be sent$")
+    public void isEmailSent() throws Throwable {
+        Assert.assertTrue(true);
+        Thread.sleep(5000);
+        driver.quit();
+    }
 
     //----------------------------------------OLD--------------------------------------------
     @Then("^We Gucci$")

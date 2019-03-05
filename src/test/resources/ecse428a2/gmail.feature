@@ -5,20 +5,25 @@ Feature: Gmail
     Given I am logged in
     When I click the ‘Compose’ button
     And I enter a valid <valid email> in the ‘to’ section
+    #And I enter <text> in <body/subject> section
     And I click the ‘Attach files’ button
     When I select the file <file> I want to send
+    And I click the ‘Send’ button
     Then We Gucci
+    #Then the email shall be sent
 
     Examples:
-    | valid email    | file   |
-    | abcd.com       | C:\Users\Gabriel\Documents\ecse428a2\pics\paper.jpg |
+    #Values for body/Subject: body, subject, both
+    #Values for file: small, medium, large, small \n medium
+    | valid email                    | file      | text | body/subject|
+    | GabrielNegashECSE428@gmail.com | paper.jpg | test | test2       |
     #| efgh@gmail.com | C:\Users\Gabriel\Documents\ecse428a2\pics\satelite.jpg |
 
-
-  Scenario: Attaching one image and sending to recipient
+  Scenario: Attaching to an email (with text) image(s) and sending to recipient
     Given I am logged in
     When I click the ‘Compose’ button
     And I enter a valid <valid email> in the ‘to’ section
+    And I enter <text> in <body/subject> section
     And I click the ‘Attach files’ button
     When I select the file <file> I want to send
     And I click the ‘Send’ button
