@@ -38,7 +38,7 @@ public class StepDefinitions {
     private final String LOG_IN = "https://accounts.google.com/AccountChooser?service=mail&continue=https://mail.google.com/mail/";
     private final String EMAIL = "GabrielNegashECSE428@gmail.com";
     private final String PASSWORD = "ECSE428A2";
-    private final String CONFIRMATION = "Message Sent";
+    private final String CONFIRMATION = "Message sent.";
 
     // Given
     @Given("^I am logged in$")
@@ -177,7 +177,7 @@ public class StepDefinitions {
         r.keyPress(KeyEvent.VK_ENTER);    // confirm by pressing Enter in the end
         r.keyRelease(KeyEvent.VK_ENTER);
 
-        Thread.sleep(3000); //TODO
+        //Thread.sleep(3000); //TODO
 
     }
 
@@ -201,12 +201,12 @@ public class StepDefinitions {
     public void isEmailSent() throws Throwable {
         System.out.println("Attempting to find Confirmation ...");
         //NOTE: Assumes span is only visible within html after email sent as opposed to simply being hidden
-        WebElement dialog = (new WebDriverWait(driver, 10))
+        WebElement dialog = (new WebDriverWait(driver, 15))
                 .until(ExpectedConditions.elementToBeClickable(
-                        By.xpath("//span[contains(text(),'Message Sent')]"))); //TODO assumes english
+                        By.xpath("//span[contains(text(),'Message sent.')]"))); //NOTE assumes english
         System.out.print("Found!\n");
-
-        Assert.assertEquals(dialog.getText(),CONFIRMATION);
+        System.out.println("Dialog Text: "+dialog.getText());
+        Assert.assertEquals(dialog.getText(),CONFIRMATION); //NOTE: assumes confirmation message doesn't change
         Thread.sleep(5000); //For user visibility purposes during execution
         driver.quit();
     }

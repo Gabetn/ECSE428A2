@@ -9,16 +9,15 @@ Feature: Gmail
     And I click the ‘Attach files’ button
     When I select the file <file> I want to send
     And I click the ‘Send’ button
-    Then We Gucci
-    #Then the email shall be sent
+    Then the email shall be sent
 
     Examples:
     #Values for body/Subject: body, subject, both
     #Values for file: small, medium, large, small \n medium
     | valid email                    | file      | text | section|
-    #| GabrielNegashECSE428@gmail.com | C:\Users\Gabriel\Documents\ecse428a2\pics\small.jpg | One | body |
+    | GabrielNegashECSE428@gmail.com | C:\Users\Gabriel\Documents\ecse428a2\pics\small.jpg | One | body |
     #| GabrielNegashECSE428@gmail.com | C:\Users\Gabriel\Documents\ecse428a2\pics\medium.jpg | Two| subject |
-    | GabrielNegashECSE428@gmail.com | C:\Users\Gabriel\Documents\ecse428a2\pics\large.jpg | Three | both |
+    #| GabrielNegashECSE428@gmail.com | C:\Users\Gabriel\Documents\ecse428a2\pics\large.jpg | Three | both |
     #| GabrielNegashECSE428@gmail.com | C:\Users\Gabriel\Documents\ecse428a2\pics\medium.jpg \n C:\Users\Gabriel\Documents\ecse428a2\pics\small.jpg| Four | subject |
     #| efgh@gmail.com | C:\Users\Gabriel\Documents\ecse428a2\pics\satelite.jpg |
 
