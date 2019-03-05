@@ -38,6 +38,8 @@ public class StepDefinitions {
     private final String LOG_IN = "https://accounts.google.com/AccountChooser?service=mail&continue=https://mail.google.com/mail/";
     private final String EMAIL = "GabrielNegashECSE428@gmail.com";
     private final String PASSWORD = "ECSE428A2";
+    private final String CONFIRMATION = "Message Sent";
+
     // Given
     @Given("^I am logged in$")
     public void givenLoggedIn() throws Throwable {
@@ -100,7 +102,6 @@ public class StepDefinitions {
             System.out.println("No Recipient field found");
         }
     }
-
     @And("^I enter a invalid ([^\"]*) in the ‘to’ section$")
     public void enterInvalidEmail(String invalidEmail) throws Throwable { //TODO: how to use scenario outline
         try {
@@ -118,6 +119,24 @@ public class StepDefinitions {
         }
     }
 
+    @And("^I enter ([^\"@]*) in ([^\"@]*) section$")
+    public void enterContent(String text, String location) throws Throwable { //TODO: how to use scenario outline
+        try {
+            WebElement textField = findElement(location);
+            System.out.println("Entering text...");
+            enterText(textField,text,Keys.TAB); //TODO replace text w/ outline value
+            System.out.println("Entered");
+            //Note: In case of both, first subject is done by default, then body
+            if (location.equals("both")){
+                textField = findElement("body");
+                System.out.println("Entering body...");
+                enterText(textField,text,Keys.ENTER);
+            }
+        } catch (Exception e) {
+            System.out.println("No Recipient field found");
+        }
+    }
+
     // When
     @And("^I click the ‘Attach files’ button$")
     public void iPressAttach() throws Throwable {
@@ -128,6 +147,7 @@ public class StepDefinitions {
                             By.xpath("//div[contains(@class,'a1 aaA aMZ')]"))); //Note: assumes class name doesn't change
             System.out.print("Found!\n");
             btn.click();
+            Thread.sleep(1000); //TODO: deal with timing
             System.out.println("Clicking Attach button.");
         } catch (Exception e) {
             System.out.println("No Attach button found");
@@ -136,11 +156,18 @@ public class StepDefinitions {
 
     @When("^I select the file ([^\"]*) I want to send$")
     public void selectFile(String fPath) throws Throwable { //TODO: how to use scenario outline
+        String[] names = fPath.split("\n");
+        StringBuilder sb = new StringBuilder();
+        for(String s : names){
+            sb.append("\""+s.trim()+"\" ");
+        }
+        fPath = sb.toString();
+        System.out.println(fPath);
         Robot r = new Robot();
         //copy to clipboard
         Clipboard cb = Toolkit.getDefaultToolkit().getSystemClipboard();
-        StringSelection stringSelection = new StringSelection( fPath );
-        cb.setContents(stringSelection, stringSelection);//st
+        StringSelection stringSelection = new StringSelection( fPath ); //TODO: replace with fPath
+        cb.setContents(stringSelection, stringSelection);
         //Paste to file explorer
         r.keyPress(KeyEvent.VK_CONTROL);
         r.keyPress(KeyEvent.VK_V);
@@ -149,6 +176,8 @@ public class StepDefinitions {
         //Click Enter
         r.keyPress(KeyEvent.VK_ENTER);    // confirm by pressing Enter in the end
         r.keyRelease(KeyEvent.VK_ENTER);
+
+        Thread.sleep(3000); //TODO
 
     }
 
@@ -167,10 +196,18 @@ public class StepDefinitions {
         }
     }
 
+    //Then
     @Then("^the email shall be sent$")
     public void isEmailSent() throws Throwable {
-        Assert.assertTrue(true);
-        Thread.sleep(5000);
+        System.out.println("Attempting to find Confirmation ...");
+        //NOTE: Assumes span is only visible within html after email sent as opposed to simply being hidden
+        WebElement dialog = (new WebDriverWait(driver, 10))
+                .until(ExpectedConditions.elementToBeClickable(
+                        By.xpath("//span[contains(text(),'Message Sent')]"))); //TODO assumes english
+        System.out.print("Found!\n");
+
+        Assert.assertEquals(dialog.getText(),CONFIRMATION);
+        Thread.sleep(5000); //For user visibility purposes during execution
         driver.quit();
     }
 
@@ -182,132 +219,7 @@ public class StepDefinitions {
         Thread.sleep(5000);
         driver.quit();
     }
-    @Given("^I am on my current shopping cart$")
-    public void iAmOnMyCurrentShoppingCart() throws Throwable {
-        setupSeleniumWebDrivers();
-        goTo(CART_URL);
-    }
 
-    @And("^I have a product that exists in my shopping cart$")
-    public void iHaveAProductThatExistsInMyShoppingCart() throws Throwable {
-        // Go to a product page
-        goTo(PRODUCT_URL);
-
-        // Add a product to shopping cart
-        System.out.println("Attempting to find Add to Cart button.. ");
-        WebElement btn = (new WebDriverWait(driver, 10))
-                .until(ExpectedConditions.elementToBeClickable(By.id(ADD_TO_CART_BTN)));
-        System.out.print("Found!\n");
-        btn.click();
-        System.out.println("Clicking Add to Cart button");
-
-        // Return to cart
-        goTo(CART_URL);
-    }
-
-
-
-    @And("^I have the same product that already exists in my shopping cart$")
-    public void iHaveTheSameProductThatAlreadyExistsInMyShoppingCart() throws Throwable {
-        iHaveAProductThatExistsInMyShoppingCart();
-    }
-
-
-
-    @When("^I press \"Add to cart\"$")
-    public void iPressAddToCart() throws Throwable {
-        goTo(PRODUCT_URL);
-        // Attempt to find add to cart button and click on it
-        try {
-            System.out.println("Attempting to find Add to cart button... ");
-            WebElement btn = (new WebDriverWait(driver, 10))
-                    .until(ExpectedConditions.elementToBeClickable(By.id(ADD_TO_CART_BTN)));
-            System.out.print("Found!\n");
-            btn.click();
-            System.out.println("Clicking add to cart button");
-        } catch (Exception e) {
-            System.out.println("No add to cart button present");
-        }
-    }
-
-    // Then
-    @Then("^the product should exist in my shopping cart$")
-    public void theProductShouldExistInMyShoppingCart() throws Throwable {
-        goTo(CART_URL);
-
-        // Attempt to find active cart
-        WebElement cart = (new WebDriverWait(driver, 10))
-                .until(ExpectedConditions.presenceOfElementLocated(By.id(ACTIVE_CART)));
-
-        // Product name should be in active cart
-        Assert.assertTrue(searchForText(cart.getText(), PRODUCT_NAME));
-    }
-
-    @Then("^the product should no longer exist in my shopping cart$")
-    public void theProductShouldNoLongerExistInMyShoppingCart() throws Throwable {
-        goTo(CART_URL);
-
-        // Attempt to find active cart
-        WebElement cart = (new WebDriverWait(driver, 10))
-                .until(ExpectedConditions.presenceOfElementLocated(By.id(ACTIVE_CART)));
-
-        // Product name should not be in active cart
-        Assert.assertFalse(searchForText(cart.getText(), PRODUCT_NAME));
-    }
-
-    @Then("^there is nothing to delete from the shopping cart$")
-    public void thereIsNothingToDeleteFromTheShoppingCart() throws Throwable {
-        // Attempt to find a delete button
-        try {
-            System.out.println("Attempting to find a delete button... ");
-            WebElement btn = (new WebDriverWait(driver, 10))
-                    .until(ExpectedConditions.elementToBeClickable(By.name(DELETE_BTN_NAME)));
-            btn.click();
-            Assert.fail("Delete button should not be present");
-        } catch (Exception e) {
-            System.out.println("No delete button present");
-        }
-    }
-
-    @And("^the quantity of the product should be equal to two$")
-    public void theQuantityOfTheProductShouldBeEqualToTwo() throws Throwable {
-        // Attempt to find quantity
-        System.out.println("Attempting to find quantity... ");
-        WebElement dropDown = (new WebDriverWait(driver, 10))
-                .until(ExpectedConditions.presenceOfElementLocated(By.className("a-dropdown-prompt")));
-        System.out.print("Found!\n");
-
-        // Quantity should be equal to two
-        Assert.assertTrue(searchForText(dropDown.getText(), "2"));
-    }
-
-    @And("^the checkout button exists$")
-    public void theCheckoutButtonExists() throws Throwable {
-        // Attempt to find checkout button
-        try {
-            System.out.println("Attempting to find checkout button");
-            WebElement checkoutBtn = (new WebDriverWait(driver, 10))
-                    .until(ExpectedConditions.presenceOfElementLocated(By.className(CHECKOUT_BTN)));
-            System.out.println("Found checkout button.");
-            driver.quit();
-        } catch (Exception e) {
-            Assert.fail("No checkout button found. Should have been present.");
-        }
-    }
-
-    @And("^the checkout button does not exist$")
-    public void theCheckoutButtonDoesNotExist() throws Throwable {
-        // Attempt to find checkout button
-        try {
-            System.out.println("Attempting to find checkout button... ");
-            WebElement checkoutBtn = (new WebDriverWait(driver, 10))
-                    .until(ExpectedConditions.presenceOfElementLocated(By.className(CHECKOUT_BTN)));
-            Assert.fail("Checkout button was found. Should have not be present.");
-        } catch (Exception e) {
-            System.out.print("None found!\n");
-            driver.quit();
-        }
-    }
 
     /**
      *     Helper functions
@@ -326,6 +238,25 @@ public class StepDefinitions {
         textField.clear();
         textField.sendKeys(str);
         textField.sendKeys(fin);
+    }
+
+    private WebElement findElement(String type){
+        WebElement el=null;
+
+        if(type.equals("body")){
+            System.out.println("Attempting to find "+type+" Field... ");
+            el = (new WebDriverWait(driver, 10))
+                    .until(ExpectedConditions.elementToBeClickable(
+                            By.xpath("//div[contains(@aria-label,'Message Body')]"))); //NOTE assumes english
+            System.out.print("Found!\n");
+        } else { //subject
+            System.out.println("Attempting to find subject Field");
+            el = (new WebDriverWait(driver, 10))
+                    .until(ExpectedConditions.elementToBeClickable(
+                            By.xpath("//input[contains(@aria-label,'Subject')]"))); //NOTE assumes english
+            System.out.print("Found!\n");
+        }
+        return el;
     }
 
     private boolean searchForText(String text, String textToFind) { //TODO: is this necessary?
