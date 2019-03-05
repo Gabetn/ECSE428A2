@@ -6,10 +6,7 @@ import cucumber.api.java.en.Given;
 import cucumber.api.java.en.Then;
 import cucumber.api.java.en.When;
 import org.junit.Assert;
-import org.openqa.selenium.By;
-import org.openqa.selenium.Keys;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
+import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
@@ -34,11 +31,13 @@ public class StepDefinitions {
 
     // MY VARIABLES
     private WebDriver driver;
+    private Alert alert;
     private final String PATH_TO_CHROME_DRIVER = "C:\\Users\\Gabriel\\Documents\\Applications\\chromedriver_win32\\chromedriver.exe";
     private final String LOG_IN = "https://accounts.google.com/AccountChooser?service=mail&continue=https://mail.google.com/mail/";
     private final String EMAIL = "GabrielNegashECSE428@gmail.com";
     private final String PASSWORD = "ECSE428A2";
     private final String CONFIRMATION = "Message sent.";
+    private final String WARNING = "Send this message without a subject or text in the body?";
 
     // Given
     @Given("^I am logged in$")
@@ -210,6 +209,30 @@ public class StepDefinitions {
         Thread.sleep(5000); //For user visibility purposes during execution
         driver.quit();
     }
+
+    @Then("^the system shall warn me that there is no subject nor body$")
+    public void isAlerted() throws Throwable {
+        System.out.println("Attempting to find alert ...");
+        //NOTE: Assumes span is only visible within html after email sent as opposed to simply being hidden
+        alert = driver.switchTo().alert(); //NOTE assumes english
+        System.out.print("Found!\n");
+        System.out.println("Alert Text: "+alert.getText());
+        Assert.assertEquals(alert.getText(),WARNING); //NOTE: assumes confirmation message doesn't change
+    }
+
+    @When("^I click the ‘Ok’ button$")
+    public void iPressOk() throws Throwable {
+        System.out.println("Attempting to find alert... ");
+        if(alert != null){
+            alert.accept();
+        } else{
+            System.out.println("Relocating alert... ");
+            driver.switchTo().alert().accept();
+        }
+        System.out.println("Accepted alert... ");
+    }
+
+
 
     //----------------------------------------OLD--------------------------------------------
     @Then("^We Gucci$")

@@ -1,7 +1,7 @@
 Feature: Gmail
 
   #This scenario is just for testing purposes
-  Scenario Outline: Testing
+  Scenario Outline: Testy
     Given I am logged in
     When I click the ‘Compose’ button
     And I enter a valid <valid email> in the ‘to’ section
@@ -31,14 +31,21 @@ Feature: Gmail
     And I click the ‘Send’ button
     Then the email shall be sent
 
-  Scenario: Attaching multiple images and sending to recipient
+  #Sending image(s) without a subject and body
+  Scenario Outline: Testing
     Given I am logged in
     When I click the ‘Compose’ button
     And I enter a valid <valid email> in the ‘to’ section
     And I click the ‘Attach files’ button
-    When I select the files I want to send
+    When I select the file <file> I want to send
     And I click the ‘Send’ button
+    Then the system shall warn me that there is no subject nor body
+    When I click the ‘Ok’ button
     Then the email shall be sent
+    Examples:
+    #Values for file: small, medium, large, small \n medium
+      | valid email                    | file      |
+      | GabrielNegashECSE428@gmail.com | C:\Users\Gabriel\Documents\ecse428a2\pics\small.jpg |
 
   Scenario: Attaching an image that is too large
     Given I am logged in
