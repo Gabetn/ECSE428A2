@@ -56,13 +56,14 @@ public class StepDefinitions {
         System.out.print("Found!\n");
 
         enterText(textField,PASSWORD,Keys.ENTER);
-
         //ENSURE PROPER REDIRECT
-        String expected = "https://mail.google.com/mail/#inbox";
-        new WebDriverWait(driver, 10)
+        //https://mail.google.com/mail/#inbox
+        String expected = "https://mail.google.com/mail/u/0/#inbox";//Note: assumes url doesn't change
+        new WebDriverWait(driver, 15)
                 .until(ExpectedConditions.urlToBe(expected));
 
         String currURL = driver.getCurrentUrl();
+        System.out.print("Check2!\n");
         Assert.assertEquals(currURL,expected);
     }
 
@@ -98,7 +99,7 @@ public class StepDefinitions {
             System.out.println("No Recipient field found");
         }
     }
-    @And("^I enter a invalid ([^\"]*) in the ‘to’ section$")
+    @And("^I input an invalid ([^\"]*) in the ‘to’ section$")
     public void enterInvalidEmail(String invalidEmail) throws Throwable { //TODO: how to use scenario outline
         try {
             System.out.println("Attempting to find Recipients Field... ");
@@ -108,7 +109,7 @@ public class StepDefinitions {
             System.out.print("Found!\n");
 
             System.out.println("Entering email...");
-            enterText(textField,invalidEmail,Keys.ENTER); //TODO replace text w/ outline value
+            enterText(textField,invalidEmail,Keys.TAB); //NOTE: assumes no autocorrection of email
             System.out.println("Entered");
         } catch (Exception e) {
             System.out.println("No Recipient field found");
@@ -205,9 +206,11 @@ public class StepDefinitions {
         System.out.print("Found!\n");
         System.out.println("Dialog Text: "+dialog.getText());
         Assert.assertEquals(dialog.getText(),CONFIRMATION); //NOTE: assumes confirmation message doesn't change
-        Thread.sleep(5000); //For user visibility purposes during execution
+        //Thread.sleep(5000); //For user visibility purposes during execution
         driver.quit();
     }
+
+
 
     @Then("^the system shall warn me that there is no subject nor body$")
     public void isAlerted() throws Throwable {
@@ -218,6 +221,7 @@ public class StepDefinitions {
         System.out.println("Alert Text: "+alert.getText());
         Assert.assertEquals(alert.getText(),WARNING); //NOTE: assumes confirmation message doesn't change
     }
+
     @Then("^the system shall attach the file\\(s\\) ([^\"]*) as google drive link\\(s\\)$")
     public void isAttached(String fPath) throws Throwable {
         String[] names = fPath.split("\n");
@@ -306,17 +310,30 @@ public class StepDefinitions {
         Assert.assertTrue(searchForText(s,"larger than"));
     }
 
-
-
-    //----------------------------------------OLD--------------------------------------------
-    @Then("^We Gucci$")
-    public void trivialEnd() throws Throwable {
-        Assert.assertTrue(true);
-        //driver.manage().timeouts().implicitlyWait(4, TimeUnit.SECONDS);
-        Thread.sleep(5000);
-        driver.quit();
+    @Then("^an error message shall be returned$")
+    public void isError() throws Throwable {
+        System.out.println("Attempting to find error ...");
+        WebElement error = (new WebDriverWait(driver, 15))
+                .until(ExpectedConditions.elementToBeClickable(
+                        By.xpath("//span[contains(text(),'Error')]"))); //NOTE assumes english
+        System.out.print("Found!\n");
+        Assert.assertTrue(searchForText(error.getText(),"Error"));
     }
 
+    @Then("^the email shall not be sent$")
+    public void isEmailNotSent() throws Throwable {
+        System.out.println("Acknowledging Error ...");
+        WebElement ok = (new WebDriverWait(driver, 5))
+                .until(ExpectedConditions.elementToBeClickable(
+                        By.name("ok"))); //NOTE assumes english
+        System.out.print("Found!\n");
+        ok.click();
+        //I.e. assert that the confirmation message does not show up, thus the email was not sent
+        Assert.assertTrue(driver.findElements(By.xpath("//span[contains(text(),'Message sent.')]")).isEmpty());
+        //Thread.sleep(5000); //For user visibility purposes during execution
+        driver.quit();
+    }
+    //----------------------------------------OLD--------------------------------------------
 
     /**
      *     Helper functions
