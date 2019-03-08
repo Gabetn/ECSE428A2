@@ -1,6 +1,8 @@
 package ecse428a2;
 
 import cucumber.api.PendingException;
+import cucumber.api.java.After;
+import cucumber.api.java.Before;
 import cucumber.api.java.en.*;
 import org.junit.Assert;
 import org.openqa.selenium.*;
@@ -35,6 +37,34 @@ public class StepDefinitions {
     private final String PASSWORD = "ECSE428A2";
     private final String CONFIRMATION = "Message sent.";
     private final String WARNING = "Send this message without a subject or text in the body?";
+
+    @Before
+    public void setUpTests(){
+        //I.e. if failed to login to sent tab
+        if(!setupTearDownHelper()){ Assert.fail(); }
+
+        //Verify number of emails sent = 0
+        Assert.assertTrue(driver.findElements(By.xpath("//div[contains(@aria-label,'Show more messages')]")).isEmpty());
+        //NOTE: assumes this div is only visible when an email in the inbox is present
+    }
+
+    @After
+    public void tearDownTests(){
+        //I.e. if failed to login to sent tab
+        if(!setupTearDownHelper()){ Assert.fail(); }
+
+        //DELETE any sent emails
+        if(!driver.findElements(By.xpath("//div[contains(@aria-label,'Show more messages')]")).isEmpty()){
+            //Click select all button
+            WebElement selector = driver.findElement(By.xpath("//span[contains(@class,'T-Jo J-J5-Ji')]"));
+            selector.click();
+
+            //Click delete button
+            WebElement delete = driver.findElement(By.xpath("//div[contains(@aria-label,'Delete')]"));
+            delete.click();
+        }
+    }
+
 
     // Given
     @Given("^I am logged in$")
@@ -186,7 +216,7 @@ public class StepDefinitions {
                     .until(ExpectedConditions.elementToBeClickable(
                             By.xpath("//div[contains(text(),'Send')]"))); //TODO assumes english
             System.out.print("Found!\n");
-            Thread.sleep(1000);
+            Thread.sleep(5000);
             btn.click();
             System.out.println("Clicking Send button.");
         } catch (Exception e) {
@@ -384,6 +414,24 @@ public class StepDefinitions {
         }
     }
 
-
+    //This helper goes to the sent tab
+    private boolean setupTearDownHelper(){
+        try{
+            givenLoggedIn();
+        } catch (Throwable throwable) {
+            System.out.println("Failed to login");
+            throwable.printStackTrace();
+            return false;
+        }
+        //SWITCH TO SENT TAB
+        System.out.println("Attempting to find Send tab... ");
+        WebElement tab = (new WebDriverWait(driver, 10))
+                .until(ExpectedConditions.elementToBeClickable(
+                        By.linkText("Sent"))); //TODO assumes english
+        System.out.print("Found!\n");
+        System.out.print("Clicking!\n");
+        tab.click();
+        return true;
+    }
 
 }
