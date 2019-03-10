@@ -368,6 +368,7 @@ public class StepDefinitions {
             System.out.println("Finding delete button");
             WebElement delete = (new WebDriverWait(driver, 10)).until(ExpectedConditions.elementToBeClickable(By.xpath("//div[contains(@aria-label,'Delete')]")));
             delete.click();
+            Thread.sleep(100); //ensure delete happens prior to quitting driver
         }
         driver.quit();
     }
@@ -401,6 +402,7 @@ public class StepDefinitions {
                             By.xpath("//div[contains(@class,'a1 aaA aMZ')]"))); //Note: assumes class name doesn't change
             System.out.print("Found!\n");
             btn.click();
+            Thread.sleep(1000); //REQUIRED due to windows explorer, cannot be handled via selenium
             System.out.println("Clicking Attach button.");
         } catch (Exception e) {
             System.out.println("No Attach button found");
