@@ -11,8 +11,6 @@ Feature: Gmail
     And the email is in the sent folder with <valid email> recipient, and subject <text>
 
     Examples:
-    #Values for body/Subject: body, subject, both
-    #Values for file: small, medium, large, small \n medium
       | valid email                    | file      | text |
       | GTNECSE4281@gmail.com | C:\Users\Gabriel\Documents\ecse428a2\pics\small.jpg | One |
       | GTNECSE4282@gmail.com | C:\Users\Gabriel\Documents\ecse428a2\pics\small.jpg | Two |
@@ -20,7 +18,6 @@ Feature: Gmail
       | GTNECSE4284@yahoo.com | C:\Users\Gabriel\Documents\ecse428a2\pics\small.jpg | Four  |
       | GTNECSE4285@yahoo.com | C:\Users\Gabriel\Documents\ecse428a2\pics\medium.jpg \n C:\Users\Gabriel\Documents\ecse428a2\pics\small.jpg| Five |
 
-  #Sending image(s) without a subject and body
   Scenario Outline: Sending image(s) without a subject and body
     Given I am logged in
     When I compose an email
@@ -33,7 +30,6 @@ Feature: Gmail
     And the email is in the sent folder with only <valid email> recipient
 
     Examples:
-    #Values for file: small, medium, large, small \n medium
       | valid email                    | file      |
       | GTNECSE4281@gmail.com | C:\Users\Gabriel\Documents\ecse428a2\pics\small.jpg   |
       | GTNECSE4282@gmail.com | C:\Users\Gabriel\Documents\ecse428a2\pics\medium.jpg  |
@@ -56,8 +52,6 @@ Feature: Gmail
     And the email is in the sent folder with <valid email> recipient, and subject <text>
 
     Examples:
-    #Values for body/Subject: body, subject, both
-    #Values for file: xl2, xl1 \n large2, small \n xl2, large \n large2, small \n medium \n large \xl1
       | valid email                    | file      | text |
       | GTNECSE4281@gmail.com | C:\Users\Gabriel\Documents\ecse428a2\pics\xl2.jpg | One |
       | GTNECSE4282@gmail.com | C:\Users\Gabriel\Documents\ecse428a2\pics\xl1.jpg \n C:\Users\Gabriel\Documents\ecse428a2\pics\large2.jpg | Two |
@@ -76,8 +70,6 @@ Feature: Gmail
     And the email shall not be sent
 
     Examples:
-    #Values for body/Subject: body, subject, both
-    #Values for file: small, medium, large, small \n medium
       | invalid email                    | file      | text |
       | GTNECSE4281.com | C:\Users\Gabriel\Documents\ecse428a2\pics\small.jpg | One |
       | GTNECSE4282.com | C:\Users\Gabriel\Documents\ecse428a2\pics\small.jpg | Two |
